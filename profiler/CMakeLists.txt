@@ -185,11 +185,11 @@ if(NOT DEFINED GIT_REV)
     set(GIT_REV "HEAD")
 endif()
 
-add_custom_target(git-ref
-    COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../extra/git-ref.py ${GIT_REV}
-    BYPRODUCTS GitRef.hpp
-)
-add_dependencies(${PROJECT_NAME} git-ref)
+#add_custom_target(git-ref
+#    COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../extra/git-ref.py ${GIT_REV}
+#    BYPRODUCTS GitRef.hpp
+#)
+#add_dependencies(${PROJECT_NAME} git-ref)
 
 if(NOT EMSCRIPTEN)
     target_link_libraries(${PROJECT_NAME} PRIVATE TracyNfd)
