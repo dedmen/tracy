@@ -130,6 +130,9 @@ extern "C" typedef char* (WINAPI *t_WineGetBuildId)();
 extern char* __progname;
 #endif
 
+#include "../../src/SignalSlot.hpp"
+
+Signal<void( bool )> tracyConnectionChanged;
 namespace tracy
 {
 
@@ -1930,6 +1933,7 @@ void Profiler::Worker()
         m_connectionId.fetch_add( 1, std::memory_order_release );
 #endif
         m_isConnected.store( true, std::memory_order_release );
+        tracyConnectionChanged( true );
         InstallCrashHandler();
 
         HandshakeStatus handshake = HandshakeWelcome;
@@ -2033,6 +2037,7 @@ void Profiler::Worker()
         if( ShouldExit() ) break;
 
         m_isConnected.store( false, std::memory_order_release );
+        tracyConnectionChanged( true );
         RemoveCrashHandler();
 
 #ifdef TRACY_ON_DEMAND
