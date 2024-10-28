@@ -474,7 +474,7 @@ Worker::Worker( const char* name, const char* program, const std::vector<ImportE
         plot->name = nptr;
         plot->type = PlotType::User;
         plot->format = v.format;
-        plot->showSteps = false;
+        plot->showSteps = true;
         plot->fill = true;
         plot->color = 0;
 
@@ -5530,7 +5530,7 @@ void Worker::ProcessPlotDataImpl( uint64_t name, int64_t evTime, double val )
         plot->name = name;
         plot->type = PlotType::User;
         plot->format = PlotValueFormatting::Number;
-        plot->showSteps = false;
+        plot->showSteps = true;
         plot->fill = true;
         plot->color = 0;
         return plot;
