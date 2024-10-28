@@ -103,12 +103,19 @@ public:
     tracy_force_inline ~ScopedZone()
     {
         if( !m_active ) return;
+        end();
+    }
+
+    tracy_force_inline void end()
+    {
 #ifdef TRACY_ON_DEMAND
         if( GetProfiler().ConnectionId() != m_connectionId ) return;
 #endif
         TracyQueuePrepare( QueueType::ZoneEnd );
         MemWrite( &item->zoneEnd.time, Profiler::GetTime() );
         TracyQueueCommit( zoneEndThread );
+
+        m_active = false;
     }
 
     tracy_force_inline void Text( const char* txt, size_t size )
@@ -216,7 +223,7 @@ public:
     tracy_force_inline bool IsActive() const { return m_active; }
 
 private:
-    const bool m_active;
+    bool m_active;
 
 #ifdef TRACY_ON_DEMAND
     uint64_t m_connectionId = 0;
