@@ -761,7 +761,15 @@ public:
     void RequestShutdown() { m_shutdown.store( true, std::memory_order_relaxed ); m_shutdownManual.store( true, std::memory_order_relaxed ); }
     bool HasShutdownFinished() const { return m_shutdownFinished.load( std::memory_order_relaxed ); }
 
-    void SendString( uint64_t str, const char* ptr, QueueType type ) { SendString( str, ptr, strlen( ptr ), type ); }
+    void SendString( uint64_t str, const char* ptr, QueueType type )
+    { 
+        if( str == 0xdddddddddddddddd )
+        {
+            SendString( str, nullptr, 0, type ); // wtf?
+            return;
+        }
+        SendString( str, ptr, strlen( ptr ), type );
+    }
     void SendString( uint64_t str, const char* ptr, size_t len, QueueType type );
     void SendSingleString( const char* ptr ) { SendSingleString( ptr, strlen( ptr ) ); }
     void SendSingleString( const char* ptr, size_t len );
