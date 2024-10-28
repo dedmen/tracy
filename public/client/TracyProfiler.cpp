@@ -342,16 +342,16 @@ static void InitFailure( const char* msg )
             hasConsole = true;
         }
     }
-    if( hasConsole )
-    {
-        fprintf( stderr, "Tracy Profiler initialization failure: %s\n", msg );
-        if( reopen )
-        {
-            freopen( "CONOUT$", "w", stderr );
-            fprintf( stderr, "Tracy Profiler initialization failure: %s\n", msg );
-        }
-    }
-    else
+    //if( hasConsole )
+    //{
+    //    fprintf( stderr, "Tracy Profiler initialization failure: %s\n", msg );
+    //    if( reopen )
+    //    {
+    //        freopen( "CONOUT$", "w", stderr );
+    //        fprintf( stderr, "Tracy Profiler initialization failure: %s\n", msg );
+    //    }
+    //}
+    //else
     {
 #  ifndef TRACY_UWP
         MessageBoxA( nullptr, msg, "Tracy Profiler initialization failure", MB_ICONSTOP );
@@ -1702,10 +1702,10 @@ void Profiler::Worker()
     if( execname )
     {
         struct stat st;
-        if( stat( execname, &st ) == 0 )
-        {
-            m_exectime = (uint64_t)st.st_mtime;
-        }
+        //if( stat( execname, &st ) == 0 )
+        //{
+        //    m_exectime = (uint64_t)st.st_mtime;
+        //}
     }
 
     const auto procname = GetProcessName();
@@ -4186,30 +4186,30 @@ void Profiler::HandleSymbolCodeQuery( uint64_t symbol, uint32_t size )
 void Profiler::HandleSourceCodeQuery( char* data, char* image, uint32_t id )
 {
     bool ok = false;
-    FILE* f = fopen( data, "rb" );
-    if( f )
-    {
-        struct stat st;
-        if( fstat( fileno( f ), &st ) == 0 && (uint64_t)st.st_mtime < m_exectime && st.st_size < ( TargetFrameSize - 16 ) )
-        {
-            auto ptr = (char*)tracy_malloc_fast( st.st_size );
-            auto rd = fread( ptr, 1, st.st_size, f );
-            if( rd == (size_t)st.st_size )
-            {
-                TracyLfqPrepare( QueueType::SourceCodeMetadata );
-                MemWrite( &item->sourceCodeMetadata.ptr, (uint64_t)ptr );
-                MemWrite( &item->sourceCodeMetadata.size, (uint32_t)rd );
-                MemWrite( &item->sourceCodeMetadata.id, id );
-                TracyLfqCommit;
-                ok = true;
-            }
-            else
-            {
-                tracy_free_fast( ptr );
-            }
-        }
-        fclose( f );
-    }
+    //FILE* f = fopen( data, "rb" );
+    //if( f )
+    //{
+    //    struct stat st;
+    //    if( fstat( fileno( f ), &st ) == 0 && (uint64_t)st.st_mtime < m_exectime && st.st_size < ( TargetFrameSize - 16 ) )
+    //    {
+    //        auto ptr = (char*)tracy_malloc_fast( st.st_size );
+    //        auto rd = fread( ptr, 1, st.st_size, f );
+    //        if( rd == (size_t)st.st_size )
+    //        {
+    //            TracyLfqPrepare( QueueType::SourceCodeMetadata );
+    //            MemWrite( &item->sourceCodeMetadata.ptr, (uint64_t)ptr );
+    //            MemWrite( &item->sourceCodeMetadata.size, (uint32_t)rd );
+    //            MemWrite( &item->sourceCodeMetadata.id, id );
+    //            TracyLfqCommit;
+    //            ok = true;
+    //        }
+    //        else
+    //        {
+    //            tracy_free_fast( ptr );
+    //        }
+    //    }
+    //    fclose( f );
+    //}
 
 #ifdef TRACY_DEBUGINFOD
     else if( image && data[0] == '/' )
