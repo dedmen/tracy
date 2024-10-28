@@ -82,7 +82,7 @@ endif()
 # freetype
 
 pkg_check_modules(FREETYPE freetype2)
-if (FREETYPE_FOUND AND NOT DOWNLOAD_FREETYPE)
+if (FREETYPE_FOUND AND DOWNLOAD_FREETYPE)
     add_library(TracyFreetype INTERFACE)
     target_include_directories(TracyFreetype INTERFACE ${FREETYPE_INCLUDE_DIRS})
     target_link_libraries(TracyFreetype INTERFACE ${FREETYPE_LINK_LIBRARIES})
