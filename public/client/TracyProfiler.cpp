@@ -810,6 +810,7 @@ static char s_crashText[1024];
 LONG WINAPI CrashFilter( PEXCEPTION_POINTERS pExp )
 {
     if( !GetProfiler().IsConnected() ) return EXCEPTION_CONTINUE_SEARCH;
+    if( IsDebuggerPresent() ) return EXCEPTION_CONTINUE_SEARCH;
 
     const unsigned ec = pExp->ExceptionRecord->ExceptionCode;
     auto msgPtr = s_crashText;
@@ -817,6 +818,8 @@ LONG WINAPI CrashFilter( PEXCEPTION_POINTERS pExp )
     {
     case EXCEPTION_ACCESS_VIOLATION:
         msgPtr += sprintf( msgPtr, "Exception EXCEPTION_ACCESS_VIOLATION (0x%x). ", ec );
+        if (!pExp->ExceptionRecord->ExceptionInformation[1])
+            return EXCEPTION_CONTINUE_SEARCH;
         switch( pExp->ExceptionRecord->ExceptionInformation[0] )
         {
         case 0:
