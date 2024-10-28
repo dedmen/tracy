@@ -23,6 +23,7 @@ enum class QueueType : uint8_t
     CallstackAlloc,
     CallstackSample,
     CallstackSampleContextSwitch,
+    CallstackArma,
     FrameImage,
     ZoneBegin,
     ZoneBeginCallstack,
@@ -802,6 +803,7 @@ static constexpr size_t QueueDataSize[] = {
     sizeof( QueueHeader ),                                  // callstack memory
     sizeof( QueueHeader ),                                  // callstack
     sizeof( QueueHeader ),                                  // callstack alloc
+    sizeof( QueueHeader ),                                  // callstack Arma
     sizeof( QueueHeader ) + sizeof( QueueCallstackSample ),
     sizeof( QueueHeader ) + sizeof( QueueCallstackSample ), // context switch
     sizeof( QueueHeader ) + sizeof( QueueFrameImage ),

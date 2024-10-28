@@ -14,6 +14,7 @@
 namespace tracy
 {
 
+struct t_withCallstack { bool enabled = true; };
 struct t_withThreadId { uint32_t threadId; };
 
 class ScopedZone
@@ -41,7 +42,7 @@ public:
         TracyQueueCommit( zoneBeginThread );
     }
 
-    tracy_force_inline ScopedZone( const SourceLocationData* srcloc, int depth, bool is_active = true )
+    tracy_force_inline ScopedZone( const SourceLocationData* srcloc, t_withCallstack c/*, int depth*/, bool is_active = true )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
 #else
@@ -52,9 +53,9 @@ public:
 #ifdef TRACY_ON_DEMAND
         m_connectionId = GetProfiler().ConnectionId();
 #endif
-        GetProfiler().SendCallstack( depth );
+        //GetProfiler().SendCallstack( depth );
 
-        TracyQueuePrepare( QueueType::ZoneBeginCallstack );
+        TracyQueuePrepare( c.enabled ? QueueType::ZoneBeginCallstack : QueueType::ZoneBegin );
         MemWrite( &item->zoneBegin.time, Profiler::GetTime() );
         MemWrite( &item->zoneBegin.srcloc, (uint64_t)srcloc );
         TracyQueueCommit( zoneBeginThread );

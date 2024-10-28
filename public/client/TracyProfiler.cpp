@@ -133,6 +133,8 @@ extern char* __progname;
 #include "../../src/SignalSlot.hpp"
 
 Signal<void( bool )> tracyConnectionChanged;
+extern void DestructCallstackStruct( void* data ); // NetworkProfiler.cpp
+
 namespace tracy
 {
 
@@ -2306,6 +2308,14 @@ static void FreeAssociatedMemory( const QueueItem& item )
         ptr = MemRead<uint64_t>( &item.callstackSampleFat.ptr );
         tracy_free( (void*)ptr );
         break;
+    case QueueType::CallstackArma:
+    {
+        ptr = MemRead<uint64_t>( &item.callstackAllocFat.nativePtr );
+        DestructCallstackStruct( (void*)ptr ); // NetworkProfiler.cpp
+        ptr = MemRead<uint64_t>( &item.callstackAllocFat.ptr );
+        tracy_free_fast( (void*)ptr );
+        break;
+    }
     case QueueType::FrameImage:
         ptr = MemRead<uint64_t>( &item.frameImageFat.image );
         tracy_free( (void*)ptr );
@@ -2499,6 +2509,45 @@ Profiler::DequeueStatus Profiler::Dequeue( moodycamel::ConsumerToken& token )
                         int64_t dt = t - refCtx;
                         refCtx = t;
                         MemWrite( &item->callstackSampleFat.time, dt );
+                        break;
+                    }
+                    case QueueType::CallstackArma:
+                    {
+                        ptr = MemRead<uint64_t>( &item->callstackAllocFat.nativePtr );
+                        DestructCallstackStruct( (void*)ptr ); // NetworkProfiler.cpp
+
+                        // SendCallstackPayload modified to have ptr be null
+                        {
+                            QueueItem itemS;
+                            MemWrite( &itemS.hdr.type, QueueType::CallstackPayload );
+                            MemWrite( &itemS.stringTransfer.ptr, 0 );
+
+                            // const auto sz = *ptr++;
+                            const auto len = 0 * sizeof( uint64_t );
+                            const auto l16 = uint16_t( len );
+
+                            NeedDataSize( QueueDataSize[(int)QueueType::CallstackPayload] + sizeof( l16 ) + l16 );
+
+                            AppendDataUnsafe( &itemS, QueueDataSize[(int)QueueType::CallstackPayload] );
+                            AppendDataUnsafe( &l16, sizeof( l16 ) );
+
+                            if( compile_time_condition<sizeof( uintptr_t ) == sizeof( uint64_t )>::value )
+                            {
+                                AppendDataUnsafe( (uintptr_t*)ptr, sizeof( uint64_t ) * sz );
+                            }
+                            else
+                            {
+                                for( uintptr_t i = 0; i < sz; i++ )
+                                {
+                                    const auto val = uint64_t( *((uintptr_t*)( ptr++ )) );
+                                    AppendDataUnsafe( &val, sizeof( uint64_t ) );
+                                }
+                            }
+                        }
+
+                        ptr = MemRead<uint64_t>( &item->callstackAllocFat.ptr );
+                        SendCallstackAlloc( ptr );
+                        tracy_free_fast( (void*)ptr );
                         break;
                     }
                     case QueueType::FrameImage:

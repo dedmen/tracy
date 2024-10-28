@@ -4636,6 +4636,7 @@ bool Worker::Process( const QueueItem& ev )
         break;
     case QueueType::Callstack:
     case QueueType::CallstackAlloc:
+    case QueueType::CallstackArma:
         ProcessCallstack();
         break;
     case QueueType::CallstackSample:
