@@ -243,6 +243,7 @@ void WINAPI EventRecordCallbackVsync( PEVENT_RECORD record )
     TracyLfqCommit;
 }
 
+#ifndef TRACY_NO_VSYNC_CAPTURE
 static void SetupVsync()
 {
 #if _WIN32_WINNT >= _WIN32_WINNT_WINBLUE && !defined(__MINGW32__)
@@ -329,6 +330,7 @@ static void SetupVsync()
     }, nullptr );
 #endif
 }
+#endif // TRACY_NO_VSYNC_CAPTURE
 
 static int GetSamplingInterval()
 {
