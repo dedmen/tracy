@@ -85,7 +85,7 @@ public:
 #ifdef TRACY_ON_DEMAND
         m_connectionId = GetProfiler().ConnectionId();
 #endif
-        //auto zoneQueue = QueueType::ZoneBeginAllocSrcLoc;
+        auto zoneQueue = QueueType::ZoneBeginAllocSrcLoc;
         //if( depth > 0 && has_callstack() )
         //{
         //    GetProfiler().SendCallstack( depth );
